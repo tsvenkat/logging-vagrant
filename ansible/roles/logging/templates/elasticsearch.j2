@@ -1,0 +1,9 @@
+cluster.name: elastictsv
+network.publish_host: {{ ansible_ssh_host }}
+
+discovery.zen.ping.multicast.enabled: false
+
+#discovery.zen.ping.unicast.hosts: ["172.28.128.5", "172.28.128.7"]
+discovery.zen.ping.unicast.hosts: [{% for host in groups['loggers'] %} "{{ hostvars[host]['ansible_ssh_host'] }}", {% endfor %}]
+#discovery.zen.ping.unicast.hosts: ["172.28.128.5"]
+

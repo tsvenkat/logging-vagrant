@@ -1,0 +1,10 @@
+---
+
+- hosts: loggers
+  sudo: true
+  roles:
+    - angstwad.docker_ubuntu
+    - logging
+
+  tasks:
+    - include: roles/logging/tasks/install.yml

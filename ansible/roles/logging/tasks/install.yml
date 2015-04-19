@@ -1,0 +1,41 @@
+---
+
+- name: install pip
+  easy_install: name=pip
+
+- name: install docker support
+  pip: name=docker-py
+
+- name: check if docker-py is installed
+  raw: pip show docker-py
+
+- name: download elasticsearch image
+  raw: docker pull dockerfile/elasticsearch
+
+- name: download logstash image
+  raw: docker pull logstash
+
+- name: create logstash config file
+  file: path=/etc/logstash/conf.d/rabbit.conf state=touch mode="u=rw,g=r,o=r"
+
+- name: create elasticsearch config dir 
+  file: path=/etc/elas state=directory mode="u=rw,g=r,o=r"
+
+- name: copy file 
+  template: src=../templates/elasticsearch.j2 dest=/etc/elas/elasticsearch.yml owner=root group=root mode="u=rw,g=r,o=r"
+
+- name: run busybox docker image
+  docker: 
+    image: dockerfile/elasticsearch  
+    name: elastic
+    count: 1
+    state: started
+    volumes:
+      - /etc/elas:/etc/elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+      #- "54328:54328"
+    command: "/elasticsearch/bin/elasticsearch -Des.config=/etc/elasticsearch/elasticsearch.yml"
+    
+
