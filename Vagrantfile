@@ -21,7 +21,7 @@ nodes = (ENV["NUM_Of_NODES"] || "1").to_i
     es_path =  'elasticdata_'+i.to_s
     FileUtils::mkdir_p es_path	
     l.vm.synced_folder "./logstash-conf", "/etc/logstash/conf.d"
-    l.vm.synced_folder "./elasticsearch", "/etc/elasticsearch"
+    #l.vm.synced_folder "./elasticsearch", "/etc/elasticsearch"
     l.vm.synced_folder "./"+es_path, "/data", owner: "vagrant", group: "vagrant"
     vm_ip = "172.28.128."+(20+i).to_s
     l.vm.network :private_network, ip: vm_ip
