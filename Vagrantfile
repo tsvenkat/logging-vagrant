@@ -11,8 +11,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |v|
      v.memory = 4096
   end
-  config.vm.network "private_network", type: "dhcp"
+  #config.vm.network "private_network", type: "dhcp"
 
+public_key_contents = File.open("ansible/log_key.pub").read.strip
 nodes = (ENV["NUM_Of_NODES"] || "1").to_i
 (1..nodes).each do |i|
   config.vm.define "lg-#{i}" do |l|
@@ -22,16 +23,32 @@ nodes = (ENV["NUM_Of_NODES"] || "1").to_i
     l.vm.synced_folder "./logstash-conf", "/etc/logstash/conf.d"
     l.vm.synced_folder "./elasticsearch", "/etc/elasticsearch"
     l.vm.synced_folder "./"+es_path, "/data", owner: "vagrant", group: "vagrant"
+    vm_ip = "172.28.128."+(20+i).to_s
+    l.vm.network :private_network, ip: vm_ip
     l.vm.network :forwarded_port, host: 5000+i, guest: 5000 
     l.vm.network :forwarded_port, host: 9200+i, guest: 9200 
     l.vm.network :forwarded_port, host: 54328+i, guest: 54328 
     #l.vm.network :forwarded_port, guest: 22, host: 2225
+    l.vm.provision :shell, inline: "echo #{public_key_contents} >> /home/vagrant/.ssh/authorized_keys" 
   end
+end
+
+# update the inventory file based on VM details
+File.open("ansible/hosts/vms","w") do |fp|
+   (1..nodes).each do |i|
+      fp.puts "lg-#{i} ansible_ssh_host=172.28.128.#{20+i}"
+   end
+   fp.puts "\n[loggers]"
+   (1..nodes).each do |i|
+      fp.puts "lg-#{i}"
+   end
 end
 
   config.vm.define "deployer" do |deployer|
      deployer.vm.box = "ubuntu/trusty64"
      deployer.vm.synced_folder "./ansible", "/ansible"
+     deployer.vm.provision :shell, path: "install_ansible.sh" 
+=begin
      deployer.vm.provision :ansible do |ansible|
          ansible.groups = {
               "loggers" => ["lg-1","lg-2"],
@@ -39,6 +56,7 @@ end
          }
          ansible.playbook = "ansible/logging.yml"
      end
+=end
      #deployer.vm.network :forwarded_port, guest: 22, host: 2226
   end
 

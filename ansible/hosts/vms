@@ -1,6 +1,6 @@
-[loggers]
-lg-1 ansible_ssh_host=172.28.128.5
-lg-2 ansible_ssh_host=172.28.128.7
+lg-1 ansible_ssh_host=172.28.128.21
+lg-2 ansible_ssh_host=172.28.128.22
 
-[loggers:vars]
-a=10
+[loggers]
+lg-1
+lg-2
