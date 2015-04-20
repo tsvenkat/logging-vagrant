@@ -1,6 +1,0 @@
----
-
-- hosts: localhost
-  - tasks:
-    - name: sample task
-      file: dest=/ansible/tsv.log mode=600 owner=vagrant group=vagrant 
