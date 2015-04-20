@@ -19,6 +19,7 @@ function SetupAnsible() {
 
 function RunPlaybook() {
   cd /home/vagrant/ansible
+  export ANSIBLE_HOST_KEY_CHECKING=False
   ansible-playbook -i hosts/vms logging.yml
 }
 
