@@ -33,4 +33,5 @@ fi
 export -f SetupAnsible
 export -f RunPlaybook
 su vagrant -c "bash -c SetupAnsible"
+sleep 15
 su vagrant -c "bash -c RunPlaybook"
